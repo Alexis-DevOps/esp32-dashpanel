@@ -30,9 +30,9 @@ static int parse_gear(const char *v)
     }
     int g = atoi(v);
     if (g < 0) {
-        g = 0;
+        return -1; /* some games (e.g. Euro Truck Simulator 2) send reverse as -1, -2, ... */
     }
-    return g > 9 ? 9 : g; /* SimHub cars can have more than 6 gears */
+    return g > 24 ? 24 : g; /* trucks can have 12-18 gears */
 }
 
 static int clamp(int v, int lo, int hi)
@@ -104,15 +104,17 @@ static void simhub_task(void *arg)
     char line[LINE_MAX_LEN];
     size_t len = 0;
     bool overflow = false;
+    bool saw_newline = false; /* SimHub terminates its lines: then never guess where a line ends */
     link_t lk = {.state = {.rpm_max = VEHICLE_DEFAULT_RPM_MAX}};
 
     for (;;) {
         uint8_t buf[64];
-        int n = usb_serial_jtag_read_bytes(buf, sizeof(buf), pdMS_TO_TICKS(20));
+        int n = usb_serial_jtag_read_bytes(buf, sizeof(buf), pdMS_TO_TICKS(50));
 
         for (int i = 0; i < n; i++) {
             char c = (char)buf[i];
             if (c == '\n' || c == '\r') {
+                saw_newline = true;
                 if (len > 0 && !overflow) {
                     line[len] = '\0';
                     handle_line(&lk, line);
@@ -126,9 +128,10 @@ static void simhub_task(void *arg)
             }
         }
 
-        /* SimHub sends each message in one write: if the line has gone quiet without a newline
-         * (message configured without '\n'), treat it as complete instead of waiting forever. */
-        if (n <= 0 && len > 0) {
+        /* Only for a sender that never sends a newline (message configured without '\n'): treat a line that
+         * has gone quiet as complete. Once a newline has been seen this is off, so a message split
+         * across USB packets can never be cut short (S:45 -> S:4, G:R -> G:). */
+        if (n <= 0 && len > 0 && !saw_newline) {
             if (!overflow) {
                 line[len] = '\0';
                 handle_line(&lk, line);

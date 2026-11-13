@@ -60,7 +60,7 @@ R:5200,S:143,G:4,F:62,M:8000,L:6500
 |-----|---------|
 | `R` | engine rpm |
 | `S` | speed, km/h |
-| `G` | gear: `R`, `N` or `1`..`9` |
+| `G` | gear: `R` (or a negative number), `N` (or 0), or `1`..`24` |
 | `F` | fuel, 0-100 % |
 | `M` | top of the rev scale (optional, 3000-12000) |
 | `L` | where the redline starts (optional) |
