@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100">
+  <!-- Generic dashboard emblem: speedometer ring with a needle, flanked by swept wings -->
+  <g fill="none" stroke="#000" stroke-linecap="round">
+    <circle cx="200" cy="50" r="38" stroke-width="8"/>
+    <path d="M200 50 L216 34" stroke-width="7"/>
+  </g>
+  <circle cx="200" cy="50" r="6" fill="#000"/>
+  <g fill="#000">
+    <!-- right wing -->
+    <polygon points="246,34 392,10 392,20 250,44"/>
+    <polygon points="248,50 372,32 372,42 250,60"/>
+    <polygon points="248,66 346,54 346,64 246,76"/>
+    <!-- left wing (mirror) -->
+    <polygon points="154,34 8,10 8,20 150,44"/>
+    <polygon points="152,50 28,32 28,42 150,60"/>
+    <polygon points="152,66 54,54 54,64 154,76"/>
+  </g>
+</svg>
